@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ScareCrowWeb - Add New Device">
+    <title>Add Device | ScareCrowWeb</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <!-- ESP Web Tools -->
+    <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+
+    <style>
+        .add-device-container {
+            max-width: 900px;
+        }
+
+        .step-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-lg);
+            overflow: hidden;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-lg);
+            background: var(--bg-glass);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .step-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .step-body {
+            padding: var(--spacing-xl);
+        }
+
+        .board-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .board-option {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .board-option:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .board-option.selected {
+            border-color: var(--accent-primary);
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .board-option i {
+            font-size: 2rem;
+            margin-bottom: var(--spacing-sm);
+            color: var(--accent-primary);
+        }
+
+        .board-option h4 {
+            font-size: 0.9rem;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .board-option p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .flash-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: var(--spacing-xl);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+
+        .flash-area i {
+            font-size: 3rem;
+            color: var(--accent-primary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .flash-area p {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        esp-web-install-button {
+            --esp-tools-button-color: var(--accent-primary);
+            --esp-tools-button-text-color: white;
+        }
+
+        esp-web-install-button::part(button) {
+            background: var(--gradient-primary);
+            border: none;
+            padding: 16px 32px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        esp-web-install-button::part(button):hover {
+            opacity: 0.9;
+        }
+
+        .unsupported-browser {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--accent-danger);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            color: var(--accent-danger);
+            display: none;
+        }
+
+        .wiring-diagram {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .wiring-table {
+            width: 100%;
+            margin-top: var(--spacing-md);
+        }
+
+        .wiring-table th,
+        .wiring-table td {
+            padding: var(--spacing-sm) var(--spacing-md);
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .wiring-table th {
+            background: var(--bg-glass);
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .wiring-table td {
+            font-size: 0.85rem;
+        }
+
+        .pin-badge {
+            background: var(--bg-tertiary);
+            padding: 2px 8px;
+            border-radius: var(--radius-sm);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+        }
+
+        .next-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-md);
+        }
+
+        .next-step-item {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+        }
+
+        .next-step-item h4 {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .next-step-item h4 i {
+            color: var(--accent-primary);
+        }
+
+        .next-step-item p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .browser-warning {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid var(--accent-warning);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .browser-warning i {
+            color: var(--accent-warning);
+            font-size: 1.25rem;
+        }
+
+        .browser-warning p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-crow"></i>
+                </div>
+                <div class="sidebar-title">
+                    <h1>ScareCrow</h1>
+                    <span>Detection System</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="../index.html" class="nav-item" data-page="dashboard">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="history.html" class="nav-item" data-page="history">
+                    <i class="fas fa-history"></i>
+                    <span>Detection History</span>
+                </a>
+                <a href="devices.html" class="nav-item" data-page="devices">
+                    <i class="fas fa-video"></i>
+                    <span>Devices</span>
+                </a>
+                <a href="alerts.html" class="nav-item" data-page="alerts">
+                    <i class="fas fa-bell"></i>
+                    <span>Alerts</span>
+                </a>
+                <a href="config.html" class="nav-item" data-page="config">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuration</span>
+                </a>
+                <a href="add-device.html" class="nav-item active" data-page="add-device">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Device</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="connection-status">
+                    <span class="status-dot"></span>
+                    <span>Connected</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <header class="page-header">
+                <div class="page-title">
+                    <h2>Add New Device</h2>
+                    <p>Flash firmware to your ESP32 and set up a new ScareCrow device</p>
+                </div>
+            </header>
+
+            <div class="add-device-container">
+
+                <!-- Browser Warning -->
+                <div class="browser-warning" id="browser-warning" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p><strong>Web Serial not supported!</strong> Please use Chrome, Edge, or Opera browser to flash
+                        your ESP32.</p>
+                </div>
+
+                <!-- Step 1: Select Board -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <h3>Select Your ESP32 Board</h3>
+                    </div>
+                    <div class="step-body">
+                        <div class="board-selector" id="board-selector">
+                            <div class="board-option selected" data-board="esp32s3-freenove"
+                                data-manifest="manifest-esp32s3.json">
+                                <i class="fas fa-microchip"></i>
+                                <h4>ESP32-S3 Freenove</h4>
+                                <p>Dual USB-C, OV2640 camera</p>
+                            </div>
+                            <div class="board-option" data-board="esp32s3-eye" data-manifest="manifest-esp32s3.json">
+                                <i class="fas fa-eye"></i>
+                                <h4>ESP32-S3-EYE</h4>
+                                <p>Espressif dev board</p>
+                            </div>
+                            <div class="board-option" data-board="esp32-cam" data-manifest="manifest-esp32cam.json">
+                                <i class="fas fa-camera"></i>
+                                <h4>ESP32-CAM AI-Thinker</h4>
+                                <p>Classic camera module</p>
+                            </div>
+                            <div class="board-option" data-board="esp32-generic" data-manifest="manifest-esp32.json">
+                                <i class="fas fa-cube"></i>
+                                <h4>Generic ESP32</h4>
+                                <p>No built-in camera</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Connect & Flash -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h3>Connect & Flash Firmware</h3>
+                    </div>
+                    <div class="step-body">
+                        <div class="flash-area">
+                            <i class="fas fa-usb"></i>
+                            <p>Connect your ESP32 board via USB cable, then click the button below.<br>
+                                <small>For ESP32-S3 Freenove: Use the USB-C port labeled "USB"</small>
+                            </p>
+
+                            <esp-web-install-button id="flash-button" manifest="firmware/manifest-esp32s3.json">
+                                <button slot="activate">
+                                    <i class="fas fa-bolt"></i>
+                                    Flash ScareCrow Firmware
+                                </button>
+                                <span slot="unsupported">
+                                    <div class="unsupported-browser">
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        Your browser doesn't support Web Serial. Use Chrome, Edge, or Opera.
+                                    </div>
+                                </span>
+                                <span slot="not-allowed">
+                                    You need to allow access to the serial port.
+                                </span>
+                            </esp-web-install-button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Hardware Wiring -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <h3>Connect Hardware Components</h3>
+                    </div>
+                    <div class="step-body">
+                        <p style="margin-bottom: var(--spacing-lg); color: var(--text-secondary);">
+                            Wire your sensors and actuators according to the diagram below. Pin assignments may vary by
+                            board.
+                        </p>
+
+                        <table class="wiring-table">
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>ESP32-S3 Freenove</th>
+                                    <th>ESP32-CAM</th>
+                                    <th>Purpose</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><i class="fas fa-broadcast-tower"></i> PIR Sensor</td>
+                                    <td><span class="pin-badge">GPIO 13</span></td>
+                                    <td><span class="pin-badge">GPIO 13</span></td>
+                                    <td>Motion detection trigger</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-cog"></i> Servo 1 (Left Arm)</td>
+                                    <td><span class="pin-badge">GPIO 12</span></td>
+                                    <td><span class="pin-badge">GPIO 12</span></td>
+                                    <td>Sweeps left-to-right</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-cog"></i> Servo 2 (Right Arm)</td>
+                                    <td><span class="pin-badge">GPIO 14</span></td>
+                                    <td><span class="pin-badge">GPIO 14</span></td>
+                                    <td>Sweeps right-to-left (mirrored)</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-lightbulb"></i> LED</td>
+                                    <td><span class="pin-badge">GPIO 4</span></td>
+                                    <td><span class="pin-badge">GPIO 4</span></td>
+                                    <td>Visual deterrent / flash</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-volume-up"></i> Buzzer</td>
+                                    <td><span class="pin-badge">GPIO 2</span></td>
+                                    <td><span class="pin-badge">GPIO 2</span></td>
+                                    <td>Audio alarm</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-sim-card"></i> SIM800L TX</td>
+                                    <td><span class="pin-badge">GPIO 15</span></td>
+                                    <td><span class="pin-badge">GPIO 15</span></td>
+                                    <td>Cellular (optional)</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-sim-card"></i> SIM800L RX</td>
+                                    <td><span class="pin-badge">GPIO 16</span></td>
+                                    <td><span class="pin-badge">GPIO 16</span></td>
+                                    <td>Cellular (optional)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="wiring-diagram" style="margin-top: var(--spacing-lg);">
+                            ESP32 Wiring Diagram:
+
+                            ┌────────────────────┐
+                            │ ESP32 Board │
+                            │ │
+                            PIR Sensor ─────┤ GPIO 13 3.3V ├───── PIR VCC
+                            │ │
+                            Servo 1 (L) ────┤ GPIO 12 GND ├───── Common GND
+                            │ │
+                            Servo 2 (R) ────┤ GPIO 14 │
+                            │ │
+                            LED ────────────┤ GPIO 4 │
+                            │ │
+                            Buzzer ─────────┤ GPIO 2 │
+                            │ │
+                            SIM800L TX ─────┤ GPIO 15 (optional) │
+                            │ │
+                            SIM800L RX ─────┤ GPIO 16 (optional) │
+                            └────────────────────┘
+
+                            Power Notes:
+                            • ESP32: 5V via USB
+                            • Servos: External 5V (1-2A recommended)
+                            • PIR: 3.3V-5V
+                            • Buzzer: 3.3V
+                            • SIM800L: 4.0-4.4V (LiPo battery)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Initial Setup -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">4</div>
+                        <h3>Configure WiFi (After Flashing)</h3>
+                    </div>
+                    <div class="step-body">
+                        <div class="next-steps">
+                            <div class="next-step-item">
+                                <h4><i class="fas fa-wifi"></i> Connect to Device</h4>
+                                <p>After flashing, the ESP32 creates a WiFi hotspot named
+                                    <strong>"ScareCrow-XXXX"</strong>
+                                </p>
+                            </div>
+                            <div class="next-step-item">
+                                <h4><i class="fas fa-key"></i> Enter Password</h4>
+                                <p>Connect using password: <strong>scarecrow123</strong></p>
+                            </div>
+                            <div class="next-step-item">
+                                <h4><i class="fas fa-globe"></i> Open Config Page</h4>
+                                <p>Your browser will auto-open the setup page, or go to <strong>192.168.4.1</strong></p>
+                            </div>
+                            <div class="next-step-item">
+                                <h4><i class="fas fa-cogs"></i> Enter Credentials</h4>
+                                <p>Enter your WiFi SSID, password, and this server's URL to connect</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        // Board selection logic
+        const boardOptions = document.querySelectorAll('.board-option');
+        const flashButton = document.getElementById('flash-button');
+
+        boardOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove selected from all
+                boardOptions.forEach(opt => opt.classList.remove('selected'));
+                // Add selected to clicked
+                option.classList.add('selected');
+
+                // Update manifest URL
+                const manifest = option.dataset.manifest;
+                flashButton.setAttribute('manifest', `firmware/${manifest}`);
+
+                showToast(`Selected: ${option.querySelector('h4').textContent}`, 'success');
+            });
+        });
+
+        // Check browser support
+        if (!('serial' in navigator)) {
+            document.getElementById('browser-warning').style.display = 'flex';
+        }
+    </script>
+</body>
+
+</html>

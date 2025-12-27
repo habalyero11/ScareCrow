@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ScareCrowWeb - Device Configuration">
+    <title>Device Configuration | ScareCrowWeb</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <style>
+        .config-container {
+            max-width: 900px;
+        }
+
+        .device-selector {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .device-selector select {
+            width: 100%;
+            padding: var(--spacing-md);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .device-selector select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .config-section {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-lg);
+            overflow: hidden;
+        }
+
+        .config-section-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-lg);
+            background: var(--bg-glass);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .config-section-header i {
+            font-size: 1.25rem;
+            color: var(--accent-primary);
+        }
+
+        .config-section-header h3 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .config-section-body {
+            padding: var(--spacing-lg);
+        }
+
+        .config-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .config-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .config-field {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .config-field label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .config-field .field-desc {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .slider-container input[type="range"] {
+            flex: 1;
+            height: 6px;
+            -webkit-appearance: none;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-full);
+            outline: none;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            cursor: pointer;
+            transition: transform 0.15s ease;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .slider-value {
+            min-width: 60px;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .config-field select,
+        .config-field input[type="number"] {
+            padding: var(--spacing-md);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .config-field select:focus,
+        .config-field input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .toggle {
+            position: relative;
+            width: 52px;
+            height: 28px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .toggle.active {
+            background: var(--accent-primary);
+        }
+
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle.active::after {
+            transform: translateX(24px);
+        }
+
+        .toggle-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .save-area {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-xl);
+        }
+
+        .btn-save {
+            background: var(--gradient-success);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-xl);
+            font-size: 1rem;
+        }
+
+        .btn-reset {
+            background: var(--bg-glass);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: var(--spacing-md) var(--spacing-xl);
+            font-size: 1rem;
+        }
+
+        .no-device-selected {
+            text-align: center;
+            padding: var(--spacing-2xl);
+            color: var(--text-muted);
+        }
+
+        .no-device-selected i {
+            font-size: 3rem;
+            margin-bottom: var(--spacing-lg);
+            opacity: 0.3;
+        }
+
+        @media (max-width: 768px) {
+            .config-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-crow"></i>
+                </div>
+                <div class="sidebar-title">
+                    <h1>ScareCrow</h1>
+                    <span>Detection System</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="../index.html" class="nav-item" data-page="dashboard">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="history.html" class="nav-item" data-page="history">
+                    <i class="fas fa-history"></i>
+                    <span>Detection History</span>
+                </a>
+                <a href="devices.html" class="nav-item" data-page="devices">
+                    <i class="fas fa-video"></i>
+                    <span>Devices</span>
+                </a>
+                <a href="alerts.html" class="nav-item" data-page="alerts">
+                    <i class="fas fa-bell"></i>
+                    <span>Alerts</span>
+                </a>
+                <a href="config.html" class="nav-item active" data-page="config">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuration</span>
+                </a>
+                <a href="add-device.html" class="nav-item" data-page="add-device">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Device</span>
+                </a>
+                <a href="setup.html" class="nav-item" data-page="setup">
+                    <i class="fas fa-magic"></i>
+                    <span>Quick Setup</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="connection-status">
+                    <span class="status-dot"></span>
+                    <span>Connected</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Page Header -->
+            <header class="page-header">
+                <div class="page-title">
+                    <h2>Device Configuration</h2>
+                    <p>Configure ESP32-CAM device settings remotely</p>
+                </div>
+            </header>
+
+            <div class="config-container">
+                <!-- Device Selector -->
+                <div class="device-selector">
+                    <label for="device-select"
+                        style="display: block; margin-bottom: var(--spacing-sm); color: var(--text-secondary);">Select
+                        Device</label>
+                    <select id="device-select">
+                        <option value="">-- Select a device --</option>
+                    </select>
+                </div>
+
+                <!-- Configuration Sections (hidden until device selected) -->
+                <div id="config-sections" style="display: none;">
+
+                    <!-- General Settings -->
+                    <div class="config-section">
+                        <div class="config-section-header">
+                            <i class="fas fa-sliders-h"></i>
+                            <h3>General Settings</h3>
+                        </div>
+                        <div class="config-section-body">
+                            <div class="config-row">
+                                <div class="config-field">
+                                    <label>Auto Deterrent</label>
+                                    <div class="toggle-container">
+                                        <div class="toggle active" id="toggle-auto-deterrent"
+                                            data-field="auto_deterrent"></div>
+                                        <span class="toggle-label">Automatically activate deterrent on detection</span>
+                                    </div>
+                                </div>
+                                <div class="config-field">
+                                    <label>Detection Threshold</label>
+                                    <div class="slider-container">
+                                        <input type="range" min="10" max="100" value="50" id="slider-threshold"
+                                            data-field="detection_threshold">
+                                        <span class="slider-value" id="value-threshold">50%</span>
+                                    </div>
+                                    <span class="field-desc">Minimum confidence to trigger (higher = fewer false
+                                        positives)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Servo Settings -->
+                    <div class="config-section">
+                        <div class="config-section-header">
+                            <i class="fas fa-cogs"></i>
+                            <h3>Servo Motor</h3>
+                        </div>
+                        <div class="config-section-body">
+                            <div class="config-row">
+                                <div class="config-field">
+                                    <label>Rotation Speed</label>
+                                    <div class="slider-container">
+                                        <input type="range" min="10" max="180" value="90" id="slider-servo-speed"
+                                            data-field="servo_speed">
+                                        <span class="slider-value" id="value-servo-speed">90°/s</span>
+                                    </div>
+                                </div>
+                                <div class="config-field">
+                                    <label>Sweep Angle</label>
+                                    <div class="slider-container">
+                                        <input type="range" min="30" max="180" value="180" id="slider-servo-angle"
+                                            data-field="servo_angle">
+                                        <span class="slider-value" id="value-servo-angle">180°</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="config-row">
+                                <div class="config-field">
+                                    <label>Duration (seconds)</label>
+                                    <div class="slider-container">
+                                        <input type="range" min="1" max="30" value="3" id="slider-servo-duration"
+                                            data-field="servo_duration">
+                                        <span class="slider-value" id="value-servo-duration">3s</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Motion Sensor Settings -->
+                    <div class="config-section">
+                        <div class="config-section-header">
+                            <i class="fas fa-broadcast-tower"></i>
+                            <h3>Motion Sensor</h3>
+                        </div>
+                        <div class="config-section-body">
+                            <div class="config-row">
+                                <div class="config-field">
+                                    <label>Sensor Type</label>
+                                    <select id="select-sensor-type" data-field="sensor_type">
+                                        <option value="0">PIR (Digital)</option>
+                                        <option value="1" selected>Analog (1V Sensor)</option>
+                                    </select>
+                                    <span class="field-desc">Select the type of motion sensor connected</span>
+                                </div>
+                                <div class="config-field">
+                                    <label>Analog Threshold</label>
+                                    <div class="slider-container">
+                                        <input type="range" min="100" max="2000" value="800"
+                                            id="slider-analog-threshold" data-field="analog_threshold">
+                                        <span class="slider-value" id="value-analog-threshold">800</span>
+                                    </div>
+                                    <span class="field-desc">ADC value to trigger (higher = less sensitive)</span>
+                                </div>
+                            </div>
+                            <div class="config-row">
+                                <div class="config-field">
+                                    <label>Capture Delay (ms)</label>
+                                    <div class="slider-container">
+                                        <input type="range" min="0" max="5000" step="100" value="500"
+                                            id="slider-capture-delay" data-field="capture_delay_ms">
+                                        <span class="slider-value" id="value-capture-delay">500ms</span>
+                                    </div>
+                                    <span class="field-desc">Delay before capturing image after trigger</span>
+                                </div>
+                                <div class="config-field">
+                                    <label>Trigger Cooldown</label>
+                                    <div class="slider-container">
+                                        <input type="range" min="60" max="600" step="60" value="60" id="slider-cooldown"
+                                            data-field="cooldown_sec">
+                                        <span class="slider-value" id="value-cooldown">1 min</span>
+                                    </div>
+                                    <span class="field-desc">Wait time between triggers (1-10 minutes)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- LED Settings -->
+                    <div class="config-section">
+                        <div class="config-section-header">
+                            <i class="fas fa-lightbulb"></i>
+                            <h3>LED Indicator</h3>
+                        </div>
+                        <div class="config-section-body">
+                            <div class="config-row">
+                                <div class="config-field">
+                                    <label>Flash Pattern</label>
+                                    <select id="select-led-pattern" data-field="led_pattern">
+                                        <option value="solid">Solid (Constant On)</option>
+                                        <option value="blink" selected>Blink</option>
+                                        <option value="strobe">Strobe (Rapid)</option>
+                                        <option value="fade">Fade In/Out</option>
+                                    </select>
+                                </div>
+                                <div class="config-field">
+                                    <label>Blink Speed (ms)</label>
+                                    <div class="slider-container">
+                                        <input type="range" min="50" max="2000" step="50" value="200"
+                                            id="slider-led-speed" data-field="led_speed_ms">
+                                        <span class="slider-value" id="value-led-speed">200ms</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="config-row">
+                                <div class="config-field">
+                                    <label>Duration (seconds)</label>
+                                    <div class="slider-container">
+                                        <input type="range" min="1" max="60" value="5" id="slider-led-duration"
+                                            data-field="led_duration_sec">
+                                        <span class="slider-value" id="value-led-duration">5s</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sound Settings -->
+                    <div class="config-section">
+                        <div class="config-section-header">
+                            <i class="fas fa-volume-up"></i>
+                            <h3>Sound Alarm</h3>
+                        </div>
+                        <div class="config-section-body">
+                            <div class="config-row">
+                                <div class="config-field">
+                                    <label>Sound Type</label>
+                                    <select id="select-sound-type" data-field="sound_type">
+                                        <option value="beep" selected>Beep</option>
+                                        <option value="siren">Siren</option>
+                                        <option value="chirp">Bird Chirp</option>
+                                    </select>
+                                </div>
+                                <div class="config-field">
+                                    <label>Volume</label>
+                                    <div class="slider-container">
+                                        <input type="range" min="0" max="100" value="80" id="slider-sound-volume"
+                                            data-field="sound_volume">
+                                        <span class="slider-value" id="value-sound-volume">80%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="config-row">
+                                <div class="config-field">
+                                    <label>Duration (seconds)</label>
+                                    <div class="slider-container">
+                                        <input type="range" min="1" max="30" value="3" id="slider-sound-duration"
+                                            data-field="sound_duration_sec">
+                                        <span class="slider-value" id="value-sound-duration">3s</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Save Buttons -->
+                    <div class="save-area">
+                        <button class="btn btn-reset" id="btn-reset">
+                            <i class="fas fa-undo"></i> Reset to Defaults
+                        </button>
+                        <button class="btn btn-save" id="btn-save">
+                            <i class="fas fa-save"></i> Save Configuration
+                        </button>
+                    </div>
+                </div>
+
+                <!-- No Device Selected Message -->
+                <div id="no-device-message" class="no-device-selected">
+                    <i class="fas fa-microchip"></i>
+                    <h3>No Device Selected</h3>
+                    <p>Select a device from the dropdown above to configure its settings.</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        const API_BASE = window.SCARECROW_API_URL || 'http://localhost:8000';
+        let currentDeviceId = null;
+        let currentConfig = {};
+
+        // ===== Initialize =====
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadDevices();
+            setupEventListeners();
+        });
+
+        // ===== Load Devices =====
+        async function loadDevices() {
+            try {
+                const response = await fetch(`${API_BASE}/devices`);
+                const data = await response.json();
+
+                const select = document.getElementById('device-select');
+                select.innerHTML = '<option value="">-- Select a device --</option>';
+
+                if (data.devices && data.devices.length > 0) {
+                    data.devices.forEach(device => {
+                        const option = document.createElement('option');
+                        option.value = device.device_id;
+                        option.textContent = `${device.device_id} (${device.status})`;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to load devices:', error);
+                showToast('Failed to load devices', 'error');
+            }
+        }
+
+        // ===== Load Device Config =====
+        async function loadConfig(deviceId) {
+            try {
+                const response = await fetch(`${API_BASE}/devices/${deviceId}/config`);
+                const data = await response.json();
+
+                if (data.success && data.config) {
+                    currentConfig = data.config;
+                    applyConfigToUI(data.config);
+                    showToast(`Loaded config for ${deviceId}`, 'success');
+                }
+            } catch (error) {
+                console.error('Failed to load config:', error);
+                showToast('Failed to load configuration', 'error');
+            }
+        }
+
+        // ===== Apply Config to UI =====
+        function applyConfigToUI(config) {
+            // Threshold
+            document.getElementById('slider-threshold').value = config.detection_threshold * 100;
+            document.getElementById('value-threshold').textContent = `${Math.round(config.detection_threshold * 100)}%`;
+
+            // Auto deterrent toggle
+            const toggle = document.getElementById('toggle-auto-deterrent');
+            if (config.auto_deterrent) {
+                toggle.classList.add('active');
+            } else {
+                toggle.classList.remove('active');
+            }
+
+            // Servo
+            document.getElementById('slider-servo-speed').value = config.servo_speed;
+            document.getElementById('value-servo-speed').textContent = `${config.servo_speed}°/s`;
+            document.getElementById('slider-servo-angle').value = config.servo_angle;
+            document.getElementById('value-servo-angle').textContent = `${config.servo_angle}°`;
+            document.getElementById('slider-servo-duration').value = config.servo_duration;
+            document.getElementById('value-servo-duration').textContent = `${config.servo_duration}s`;
+
+            // PIR
+            document.getElementById('slider-pir-delay').value = config.pir_delay_ms;
+            document.getElementById('value-pir-delay').textContent = `${config.pir_delay_ms}ms`;
+            document.getElementById('slider-pir-cooldown').value = config.pir_cooldown_sec;
+            document.getElementById('value-pir-cooldown').textContent = `${config.pir_cooldown_sec}s`;
+
+            // LED
+            document.getElementById('select-led-pattern').value = config.led_pattern;
+            document.getElementById('slider-led-speed').value = config.led_speed_ms;
+            document.getElementById('value-led-speed').textContent = `${config.led_speed_ms}ms`;
+            document.getElementById('slider-led-duration').value = config.led_duration_sec;
+            document.getElementById('value-led-duration').textContent = `${config.led_duration_sec}s`;
+
+            // Sound
+            document.getElementById('select-sound-type').value = config.sound_type;
+            document.getElementById('slider-sound-volume').value = config.sound_volume;
+            document.getElementById('value-sound-volume').textContent = `${config.sound_volume}%`;
+            document.getElementById('slider-sound-duration').value = config.sound_duration_sec;
+            document.getElementById('value-sound-duration').textContent = `${config.sound_duration_sec}s`;
+        }
+
+        // ===== Gather Config from UI =====
+        function getConfigFromUI() {
+            return {
+                detection_threshold: parseInt(document.getElementById('slider-threshold').value) / 100,
+                auto_deterrent: document.getElementById('toggle-auto-deterrent').classList.contains('active'),
+                servo_speed: parseInt(document.getElementById('slider-servo-speed').value),
+                servo_angle: parseInt(document.getElementById('slider-servo-angle').value),
+                servo_duration: parseInt(document.getElementById('slider-servo-duration').value),
+                pir_delay_ms: parseInt(document.getElementById('slider-pir-delay').value),
+                pir_cooldown_sec: parseInt(document.getElementById('slider-pir-cooldown').value),
+                led_pattern: document.getElementById('select-led-pattern').value,
+                led_speed_ms: parseInt(document.getElementById('slider-led-speed').value),
+                led_duration_sec: parseInt(document.getElementById('slider-led-duration').value),
+                sound_type: document.getElementById('select-sound-type').value,
+                sound_volume: parseInt(document.getElementById('slider-sound-volume').value),
+                sound_duration_sec: parseInt(document.getElementById('slider-sound-duration').value)
+            };
+        }
+
+        // ===== Save Config =====
+        async function saveConfig() {
+            if (!currentDeviceId) return;
+
+            const config = getConfigFromUI();
+
+            try {
+                const response = await fetch(`${API_BASE}/devices/${currentDeviceId}/config`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showToast('Configuration saved successfully!', 'success');
+                    currentConfig = data.config;
+                } else {
+                    showToast('Failed to save configuration', 'error');
+                }
+            } catch (error) {
+                console.error('Failed to save config:', error);
+                showToast('Error saving configuration', 'error');
+            }
+        }
+
+        // ===== Reset to Defaults =====
+        function resetToDefaults() {
+            const defaults = {
+                detection_threshold: 0.5,
+                auto_deterrent: true,
+                servo_speed: 90,
+                servo_angle: 180,
+                servo_duration: 3,
+                pir_delay_ms: 500,
+                pir_cooldown_sec: 10,
+                led_pattern: 'blink',
+                led_speed_ms: 200,
+                led_duration_sec: 5,
+                sound_type: 'beep',
+                sound_volume: 80,
+                sound_duration_sec: 3
+            };
+            applyConfigToUI(defaults);
+            showToast('Reset to default values', 'info');
+        }
+
+        // ===== Setup Event Listeners =====
+        function setupEventListeners() {
+            // Device selector
+            document.getElementById('device-select').addEventListener('change', async (e) => {
+                const deviceId = e.target.value;
+                if (deviceId) {
+                    currentDeviceId = deviceId;
+                    await loadConfig(deviceId);
+                    document.getElementById('config-sections').style.display = 'block';
+                    document.getElementById('no-device-message').style.display = 'none';
+                } else {
+                    currentDeviceId = null;
+                    document.getElementById('config-sections').style.display = 'none';
+                    document.getElementById('no-device-message').style.display = 'block';
+                }
+            });
+
+            // Toggle buttons
+            document.querySelectorAll('.toggle').forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    toggle.classList.toggle('active');
+                });
+            });
+
+            // Slider value updates
+            document.querySelectorAll('input[type="range"]').forEach(slider => {
+                slider.addEventListener('input', (e) => {
+                    const valueSpan = document.getElementById(`value-${e.target.id.replace('slider-', '')}`);
+                    if (valueSpan) {
+                        let value = e.target.value;
+                        const id = e.target.id;
+
+                        if (id.includes('threshold') || id.includes('volume')) {
+                            valueSpan.textContent = `${value}%`;
+                        } else if (id.includes('speed') && id.includes('servo')) {
+                            valueSpan.textContent = `${value}°/s`;
+                        } else if (id.includes('angle')) {
+                            valueSpan.textContent = `${value}°`;
+                        } else if (id.includes('duration') || id.includes('cooldown')) {
+                            valueSpan.textContent = `${value}s`;
+                        } else if (id.includes('delay') || id.includes('led-speed')) {
+                            valueSpan.textContent = `${value}ms`;
+                        } else {
+                            valueSpan.textContent = value;
+                        }
+                    }
+                });
+            });
+
+            // Save button
+            document.getElementById('btn-save').addEventListener('click', saveConfig);
+
+            // Reset button
+            document.getElementById('btn-reset').addEventListener('click', resetToDefaults);
+        }
+    </script>
+</body>
+
+</html>

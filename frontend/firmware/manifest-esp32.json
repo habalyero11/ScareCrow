@@ -1,0 +1,26 @@
+{
+    "name": "ScareCrow Firmware (No Camera)",
+    "version": "1.0.0",
+    "home_assistant_domain": "scarecrow",
+    "funding_url": "",
+    "new_install_prompt_erase": true,
+    "builds": [
+        {
+            "chipFamily": "ESP32",
+            "parts": [
+                {
+                    "path": "esp32-bootloader.bin",
+                    "offset": 4096
+                },
+                {
+                    "path": "esp32-partitions.bin",
+                    "offset": 32768
+                },
+                {
+                    "path": "esp32-firmware.bin",
+                    "offset": 65536
+                }
+            ]
+        }
+    ]
+}

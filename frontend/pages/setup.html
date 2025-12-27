@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ScareCrowWeb - Quick Setup Guide">
+    <title>Quick Setup | ScareCrowWeb</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="../css/styles.css">
+
+    <style>
+        .setup-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-section {
+            text-align: center;
+            padding: var(--spacing-2xl) 0;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .hero-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: var(--spacing-md);
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-section p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .server-info {
+            background: var(--gradient-success);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+            text-align: center;
+        }
+
+        .server-info h3 {
+            color: #000;
+            font-size: 1rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .server-url {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #000;
+            font-family: monospace;
+        }
+
+        .server-url-secondary {
+            font-size: 0.9rem;
+            color: rgba(0, 0, 0, 0.6);
+            margin-top: var(--spacing-xs);
+        }
+
+        .step-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-lg);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            background: var(--bg-glass);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient-primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #000;
+            flex-shrink: 0;
+        }
+
+        .step-title h3 {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .step-title p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .step-body {
+            padding: var(--spacing-lg);
+        }
+
+        .step-body ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .step-body li {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            padding: var(--spacing-sm) 0;
+            color: var(--text-secondary);
+        }
+
+        .step-body li i {
+            color: var(--accent-primary);
+            margin-top: 3px;
+        }
+
+        .step-image {
+            margin-top: var(--spacing-lg);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            text-align: center;
+        }
+
+        .step-image .mock-screen {
+            background: #0a0a12;
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            max-width: 300px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .mock-screen .wifi-name {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .mock-screen .wifi-name i {
+            color: var(--accent-primary);
+        }
+
+        .led-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-lg);
+            padding: var(--spacing-md);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .led-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            animation: blink 1s infinite;
+        }
+
+        .led-dot.slow {
+            animation-duration: 2s;
+        }
+
+        .led-dot.fast {
+            animation-duration: 0.4s;
+        }
+
+        .led-dot.solid {
+            animation: none;
+        }
+
+        .led-dot.blue {
+            background: #3b82f6;
+            box-shadow: 0 0 10px #3b82f6;
+        }
+
+        .led-dot.yellow {
+            background: #facc15;
+            box-shadow: 0 0 10px #facc15;
+        }
+
+        .led-dot.green {
+            background: #22c55e;
+            box-shadow: 0 0 10px #22c55e;
+        }
+
+        .led-dot.red {
+            background: #ef4444;
+            box-shadow: 0 0 10px #ef4444;
+        }
+
+        @keyframes blink {
+
+            0%,
+            50% {
+                opacity: 1;
+            }
+
+            51%,
+            100% {
+                opacity: 0.2;
+            }
+        }
+
+        .troubleshoot {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+
+        .troubleshoot h3 {
+            color: #ef4444;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .troubleshoot-item {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .troubleshoot-item strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .troubleshoot-item p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-crow"></i>
+                </div>
+                <div class="sidebar-title">
+                    <h1>ScareCrow</h1>
+                    <span>Detection System</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="../index.html" class="nav-item" data-page="dashboard">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="history.html" class="nav-item" data-page="history">
+                    <i class="fas fa-history"></i>
+                    <span>Detection History</span>
+                </a>
+                <a href="devices.html" class="nav-item" data-page="devices">
+                    <i class="fas fa-video"></i>
+                    <span>Devices</span>
+                </a>
+                <a href="alerts.html" class="nav-item" data-page="alerts">
+                    <i class="fas fa-bell"></i>
+                    <span>Alerts</span>
+                </a>
+                <a href="config.html" class="nav-item" data-page="config">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuration</span>
+                </a>
+                <a href="setup.html" class="nav-item active" data-page="setup">
+                    <i class="fas fa-magic"></i>
+                    <span>Quick Setup</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="connection-status">
+                    <span class="status-dot"></span>
+                    <span>Connected</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <div class="page-title">
+                    <h2>Quick Setup Guide</h2>
+                    <p>Get your ScareCrow device up and running in minutes</p>
+                </div>
+            </header>
+
+            <div class="setup-container">
+                <!-- Hero Section -->
+                <div class="hero-section">
+                    <h1>🦅 Welcome to ScareCrow</h1>
+                    <p>Follow these simple steps to connect your device</p>
+                </div>
+
+                <!-- Server Info Card -->
+                <div class="server-info">
+                    <h3>📡 Your Server Address</h3>
+                    <div class="server-url">http://scarecrow.local:8000</div>
+                    <div class="server-url-secondary">
+                        or <span id="server-ip">http://loading...</span>
+                    </div>
+                </div>
+
+                <!-- Step 1 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <div class="step-title">
+                            <h3>Power On Your Device</h3>
+                            <p>Connect the ESP32 to power and wait for the LED</p>
+                        </div>
+                    </div>
+                    <div class="step-body">
+                        <ul>
+                            <li>
+                                <i class="fas fa-plug"></i>
+                                <span>Connect the ESP32 to a 5V USB power source</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-clock"></i>
+                                <span>Wait about 10 seconds for the device to boot</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-lightbulb"></i>
+                                <span>Watch for the LED to start blinking slowly (captive portal mode)</span>
+                            </li>
+                        </ul>
+
+                        <div class="step-image">
+                            <h4 style="margin-bottom: var(--spacing-md); color: var(--text-secondary);">LED Status Guide
+                            </h4>
+                            <div class="led-indicator">
+                                <div class="led-dot blue slow"></div>
+                                <span>Slow blink = Ready for setup (captive portal)</span>
+                            </div>
+                            <div class="led-indicator">
+                                <div class="led-dot yellow fast"></div>
+                                <span>Fast blink = Connecting to WiFi</span>
+                            </div>
+                            <div class="led-indicator">
+                                <div class="led-dot green solid"></div>
+                                <span>Solid green = Connected successfully!</span>
+                            </div>
+                            <div class="led-indicator">
+                                <div class="led-dot red fast"></div>
+                                <span>Rapid red = Error (check WiFi password)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <div class="step-title">
+                            <h3>Connect to ScareCrow WiFi</h3>
+                            <p>Use your phone or computer to connect to the device's hotspot</p>
+                        </div>
+                    </div>
+                    <div class="step-body">
+                        <ul>
+                            <li>
+                                <i class="fas fa-wifi"></i>
+                                <span>Open WiFi settings on your phone/computer</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-search"></i>
+                                <span>Look for a network named <strong>ScareCrow-XXXX</strong></span>
+                            </li>
+                            <li>
+                                <i class="fas fa-key"></i>
+                                <span>Password: <code
+                                        style="background: var(--bg-tertiary); padding: 2px 8px; border-radius: 4px;">scarecrow123</code></span>
+                            </li>
+                        </ul>
+
+                        <div class="step-image">
+                            <div class="mock-screen">
+                                <p style="color: #666; font-size: 12px; margin-bottom: 10px;">Available Networks:</p>
+                                <div class="wifi-name">
+                                    <i class="fas fa-wifi"></i>
+                                    <span>ScareCrow-A1B2</span>
+                                    <i class="fas fa-lock" style="margin-left: auto; font-size: 12px;"></i>
+                                </div>
+                                <div style="padding: 10px; color: #666; font-size: 13px;">
+                                    Your Home WiFi<br>
+                                    Neighbor's WiFi<br>
+                                    ...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <div class="step-title">
+                            <h3>Configure Your Device</h3>
+                            <p>A setup page will open automatically</p>
+                        </div>
+                    </div>
+                    <div class="step-body">
+                        <ul>
+                            <li>
+                                <i class="fas fa-globe"></i>
+                                <span>A configuration page should open automatically</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-external-link-alt"></i>
+                                <span>If not, open your browser and go to <strong>http://192.168.4.1</strong></span>
+                            </li>
+                            <li>
+                                <i class="fas fa-list"></i>
+                                <span><strong>Select your home WiFi</strong> from the dropdown list</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-lock"></i>
+                                <span>Enter your WiFi password</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-server"></i>
+                                <span>Server URL is pre-filled as <code>http://scarecrow.local:8000</code></span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check-circle"></i>
+                                <span>Click <strong>Save & Connect</strong></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="step-card">
+                    <div class="step-header">
+                        <div class="step-number">4</div>
+                        <div class="step-title">
+                            <h3>You're Done! 🎉</h3>
+                            <p>Your device will connect and appear on the dashboard</p>
+                        </div>
+                    </div>
+                    <div class="step-body">
+                        <ul>
+                            <li>
+                                <i class="fas fa-sync"></i>
+                                <span>The device will restart and connect to your home WiFi</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-check"></i>
+                                <span>The LED will turn solid green when connected</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-desktop"></i>
+                                <span>Go to the <a href="devices.html" style="color: var(--accent-primary);">Devices
+                                        page</a> to see your device</span>
+                            </li>
+                            <li>
+                                <i class="fas fa-hand-point-up"></i>
+                                <span>Wave in front of the motion sensor to test!</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Troubleshooting -->
+                <div class="troubleshoot">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Troubleshooting</h3>
+
+                    <div class="troubleshoot-item">
+                        <strong>Can't find ScareCrow-XXXX WiFi?</strong>
+                        <p>Hold the BOOT button on the ESP32 for 5 seconds to reset and restart the captive portal.</p>
+                    </div>
+
+                    <div class="troubleshoot-item">
+                        <strong>Device shows red LED after connecting?</strong>
+                        <p>The WiFi password might be incorrect. Reset the device and try again.</p>
+                    </div>
+
+                    <div class="troubleshoot-item">
+                        <strong>Device connected but not appearing on dashboard?</strong>
+                        <p>Make sure your computer and the ESP32 are on the same WiFi network. Try using the IP address
+                            instead of scarecrow.local.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="../js/config.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        // Fetch and display server IP
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('http://localhost:8000/info');
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('server-ip').textContent =
+                        `http://${data.server.ip}:${data.server.port}`;
+                }
+            } catch (error) {
+                document.getElementById('server-ip').textContent = 'http://YOUR_PC_IP:8000';
+            }
+        });
+    </script>
+</body>
+
+</html>

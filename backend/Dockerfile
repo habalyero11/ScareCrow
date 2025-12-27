@@ -14,22 +14,19 @@ RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
+# Copy requirements first (we're already in backend directory)
 COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
+# Copy all backend files
 COPY . .
-
-# Make sure the YOLO model is included
-# (yolov8n.pt should be in the backend directory)
 
 # Create temp uploads directory
 RUN mkdir -p /tmp/uploads
 
-# Expose port (Railway/Cloud Run use PORT env variable)
+# Expose port (Railway uses PORT env variable)
 EXPOSE 8080
 
 # Set environment variables
@@ -37,5 +34,4 @@ ENV PORT=8080
 ENV PYTHONUNBUFFERED=1
 
 # Run the cloud version of the application
-# Railway sets PORT dynamically, so we use shell form to expand $PORT
 CMD uvicorn main_cloud:app --host 0.0.0.0 --port ${PORT:-8080}

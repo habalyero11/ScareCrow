@@ -9,7 +9,7 @@ To run locally:
 
 To switch to cloud mode, update imports in main.py or rename this file.
 """
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
 from contextlib import asynccontextmanager
@@ -192,6 +192,98 @@ async def upload_image_endpoint(
         
     except Exception as e:
         print(f"❌ Error processing image: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/upload/esp32")
+async def upload_esp32(
+    request: Request,
+    x_device_id: str = Header(None, alias="X-Device-ID")
+):
+    """
+    Alternative upload endpoint for ESP32 devices.
+    
+    ESP32 sends raw JPEG with X-Device-ID header.
+    This endpoint handles that format directly.
+    """
+    try:
+        # Get device ID from header
+        device_id = x_device_id
+        if not device_id:
+            raise HTTPException(status_code=400, detail="X-Device-ID header required")
+        
+        detection_time = datetime.now()
+        
+        # Read raw body (JPEG data)
+        image_data = await request.body()
+        if len(image_data) == 0:
+            raise HTTPException(status_code=400, detail="No image data received")
+        
+        # Generate unique filename
+        unique_filename = f"{device_id}_{detection_time.strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.jpg"
+        
+        # Save temporarily for YOLO processing
+        temp_path = os.path.join(UPLOAD_DIR, unique_filename)
+        with open(temp_path, "wb") as f:
+            f.write(image_data)
+        
+        print(f"📷 ESP32 image received from {device_id}: {unique_filename} ({len(image_data)} bytes)")
+        
+        # Update device status
+        upsert_device(device_id)
+        
+        # Run YOLO detection
+        detections, annotated_path = detect_animals(temp_path, draw_boxes=True)
+        animal_name, confidence = get_primary_detection(detections)
+        
+        # Upload annotated image to Supabase Storage
+        if annotated_path and os.path.exists(annotated_path):
+            with open(annotated_path, "rb") as f:
+                annotated_data = f.read()
+            annotated_filename = f"annotated_{unique_filename}"
+            image_url = upload_image(annotated_data, annotated_filename)
+            os.remove(annotated_path)
+        else:
+            image_url = upload_image(image_data, unique_filename)
+            annotated_filename = unique_filename
+        
+        # Clean up temp file
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+        
+        # Save detection to database
+        detection_id = save_detection(
+            device_id=device_id,
+            animal=animal_name,
+            confidence=confidence,
+            image_path=image_url or annotated_filename,
+            timestamp=detection_time
+        )
+        
+        # Create alert for animal detection
+        if animal_name != 'none' and confidence > 0.5:
+            alert_message = f"🐾 {animal_name.upper()} detected with {confidence:.0%} confidence"
+            save_alert(device_id, alert_message)
+        
+        print(f"✅ ESP32 detection complete: {animal_name} ({confidence:.2%})")
+        
+        return JSONResponse({
+            "success": True,
+            "message": "Image processed successfully",
+            "detection": {
+                "id": detection_id,
+                "device_id": device_id,
+                "animal": animal_name,
+                "confidence": confidence
+            }
+        })
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error processing ESP32 image: {str(e)}")
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))

@@ -449,7 +449,7 @@ void captureAndUpload() {
     
     // Upload to server
     if (wifiConnected && serverUrl.length() > 0) {
-        String url = serverUrl + "/upload";
+        String url = serverUrl + "/upload/esp32";
         
         http.begin(url);
         http.setTimeout(10000);

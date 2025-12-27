@@ -15,14 +15,14 @@ RUN apt-get update && apt-get install -y \
     libgl1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first (from backend directory)
-COPY backend/requirements.txt .
+# Copy requirements first
+COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend application code
-COPY backend/ .
+# Copy all application code
+COPY . .
 
 # Create temp uploads directory
 RUN mkdir -p /tmp/uploads

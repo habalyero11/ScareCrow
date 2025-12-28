@@ -170,7 +170,7 @@ def get_active_device_count() -> int:
 DEFAULT_CONFIG = {
     'servo_speed': 90,
     'servo_angle': 180,
-    'servo_duration': 3,
+    'servo_duration': 20,
     'pir_delay_ms': 500,
     'pir_cooldown_sec': 10,
     'led_pattern': 'blink',

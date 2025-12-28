@@ -1,8 +1,8 @@
 # Use Python 3.11 slim image
 FROM python:3.11-slim
 
-# Set working directory
-WORKDIR /app
+# Set working directory to /app/backend
+WORKDIR /app/backend
 
 # Install system dependencies for OpenCV
 RUN apt-get update && apt-get install -y \
@@ -11,21 +11,21 @@ RUN apt-get update && apt-get install -y \
     libxext6 \
     libxrender-dev \
     libgomp1 \
-    libgl1 \
+    libgl1-mesa-glx \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first
-COPY requirements.txt .
+COPY backend/requirements.txt .
 
-# Install Python dependencies (no PyTorch = much smaller!)
+# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Download YOLOv8n ONNX model (~6.3MB)
 RUN curl -L -o yolov8n.onnx https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8n.onnx
 
-# Copy all application code
-COPY . .
+# Copy backend code
+COPY backend/ .
 
 # Create temp uploads directory
 RUN mkdir -p /tmp/uploads

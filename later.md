@@ -1,8 +1,9 @@
 # ScareCrowWeb - Continue Later Notes
 
-## Current Status: Railway Build SUCCESS! ✅
+## Current Status: ONNX Migration Complete 🔄
 
-The backend is now building on Railway!
+Migrated from PyTorch/Ultralytics to ONNX Runtime to fix Railway 4GB image limit.
+Previous image: 8.4GB → Expected new image: ~800MB-1.2GB
 
 ---
 

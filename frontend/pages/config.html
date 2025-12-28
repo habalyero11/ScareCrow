@@ -372,10 +372,11 @@
                                 <div class="config-field">
                                     <label>Duration (seconds)</label>
                                     <div class="slider-container">
-                                        <input type="range" min="1" max="30" value="3" id="slider-servo-duration"
+                                        <input type="range" min="1" max="60" value="20" id="slider-servo-duration"
                                             data-field="servo_duration">
-                                        <span class="slider-value" id="value-servo-duration">3s</span>
+                                        <span class="slider-value" id="value-servo-duration">20s</span>
                                     </div>
+                                    <span class="field-desc">How long the servo waves when triggered (1-60s)</span>
                                 </div>
                             </div>
                         </div>
@@ -679,7 +680,7 @@
                 auto_deterrent: true,
                 servo_speed: 90,
                 servo_angle: 180,
-                servo_duration: 3,
+                servo_duration: 20,
                 pir_delay_ms: 500,
                 pir_cooldown_sec: 10,
                 led_pattern: 'blink',

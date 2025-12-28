@@ -1,5 +1,5 @@
 /*
- * ScareCrow ESP32 Configuration v3.0
+ * ScareCrow ESP32 Configuration v3.1
  * 
  * IMPORTANT PIN NOTES FOR ESP32-S3 CAM:
  * - Camera uses: GPIO 4,5,6,7,8,9,10,11,12,13,15,16,17,18
@@ -10,10 +10,13 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// ==================== NETWORK ====================
-#define AP_NAME_PREFIX "ScareCrow-"
-#define AP_PASSWORD "scarecrow123"
-#define DEFAULT_SERVER_URL "http://192.168.0.103:8000"
+// ==================== WIFI CREDENTIALS ====================
+// IMPORTANT: Set your WiFi credentials here before flashing!
+#define WIFI_SSID "YOUR_WIFI_SSID"       // <-- CHANGE THIS
+#define WIFI_PASSWORD "YOUR_WIFI_PASS"   // <-- CHANGE THIS
+
+// ==================== SERVER ====================
+#define DEFAULT_SERVER_URL "http://192.168.0.103:8000"  // <-- Change to your server
 
 // ==================== SENSOR ====================
 // Sensor connected to GPIO 2 (ADC1 - works with WiFi)
@@ -28,9 +31,12 @@
 #define PIN_SERVO1 41           // Servo 1
 #define PIN_SERVO2 42           // Servo 2
 
-// ==================== BEHAVIOR ====================
-#define AUTO_DETERRENT true     // Activate deterrent on detection
-#define CAPTURE_DELAY_MS 500    // Delay before photo after trigger
-#define CONFIG_FETCH_INTERVAL 30000  // Fetch config every 30s
+// ==================== DETERRENT BEHAVIOR ====================
+#define AUTO_DETERRENT true             // Activate deterrent on detection
+#define DEFAULT_SERVO_DURATION 20000    // Servo activation time in ms (20 seconds default)
+#define CAPTURE_DELAY_MS 500            // Delay before photo after trigger
+#define CONFIG_FETCH_INTERVAL 30000     // Fetch config every 30s
+
+// Note: Servo duration can be changed from frontend via /devices/{id}/config endpoint
 
 #endif

@@ -4,7 +4,7 @@ FROM python:3.11-slim
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies for OpenCV and image processing
+# Install system dependencies for OpenCV
 RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     libsm6 \
@@ -12,13 +12,17 @@ RUN apt-get update && apt-get install -y \
     libxrender-dev \
     libgomp1 \
     libgl1-mesa-glx \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first (we're already in backend directory)
 COPY requirements.txt .
 
-# Install Python dependencies
+# Install Python dependencies (no PyTorch = much smaller!)
 RUN pip install --no-cache-dir -r requirements.txt
+
+# Download YOLOv8n ONNX model (~6.3MB)
+RUN curl -L -o yolov8n.onnx https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8n.onnx
 
 # Copy all backend files
 COPY . .

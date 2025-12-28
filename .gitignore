@@ -37,3 +37,7 @@ esp32/**/.pio/
 
 # Node modules (if any)
 node_modules/
+
+# YOLO model files (downloaded during Docker build)
+*.pt
+*.onnx

@@ -11,15 +11,22 @@ from supabase import create_client, Client
 # Load environment variables
 load_dotenv()
 
-# Supabase client
+# Supabase client (initialized lazily)
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
 STORAGE_BUCKET = os.environ.get('STORAGE_BUCKET', 'scarecrow-images')
 
-if not SUPABASE_URL or not SUPABASE_KEY:
-    raise ValueError("SUPABASE_URL and SUPABASE_KEY environment variables are required")
+_supabase: Client = None
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+def _get_client() -> Client:
+    """Get or create Supabase client."""
+    global _supabase
+    if _supabase is None:
+        if not SUPABASE_URL or not SUPABASE_KEY:
+            print(f"⚠️ SUPABASE_URL or SUPABASE_KEY not set!")
+            raise ValueError("SUPABASE_URL and SUPABASE_KEY environment variables are required")
+        _supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    return _supabase
 
 
 def upload_image(file_data: bytes, filename: str) -> Optional[str]:
@@ -34,15 +41,16 @@ def upload_image(file_data: bytes, filename: str) -> Optional[str]:
         Public URL of the uploaded image, or None on error
     """
     try:
+        client = _get_client()
         # Upload to storage bucket
-        result = supabase.storage.from_(STORAGE_BUCKET).upload(
+        result = client.storage.from_(STORAGE_BUCKET).upload(
             path=filename,
             file=file_data,
             file_options={"content-type": "image/jpeg"}
         )
         
         # Get public URL
-        public_url = supabase.storage.from_(STORAGE_BUCKET).get_public_url(filename)
+        public_url = client.storage.from_(STORAGE_BUCKET).get_public_url(filename)
         print(f"✅ Image uploaded: {filename}")
         return public_url
         
@@ -61,7 +69,7 @@ def get_image_url(filename: str) -> str:
     Returns:
         Public URL of the image
     """
-    return supabase.storage.from_(STORAGE_BUCKET).get_public_url(filename)
+    return _get_client().storage.from_(STORAGE_BUCKET).get_public_url(filename)
 
 
 def delete_image(filename: str) -> bool:
@@ -75,7 +83,7 @@ def delete_image(filename: str) -> bool:
         True if deleted successfully, False otherwise
     """
     try:
-        supabase.storage.from_(STORAGE_BUCKET).remove([filename])
+        _get_client().storage.from_(STORAGE_BUCKET).remove([filename])
         print(f"✅ Image deleted: {filename}")
         return True
     except Exception as e:
@@ -88,8 +96,9 @@ def init_storage():
     Verify storage bucket exists and is accessible.
     """
     try:
+        client = _get_client()
         # Try to list files (will fail if bucket doesn't exist)
-        supabase.storage.from_(STORAGE_BUCKET).list(limit=1)
+        client.storage.from_(STORAGE_BUCKET).list(limit=1)
         print(f"✅ Supabase Storage bucket '{STORAGE_BUCKET}' ready")
         return True
     except Exception as e:

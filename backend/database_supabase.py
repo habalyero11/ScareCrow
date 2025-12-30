@@ -13,14 +13,23 @@ from supabase import create_client, Client
 # Load environment variables
 load_dotenv()
 
-# Supabase client
+# Supabase client (initialized lazily)
 SUPABASE_URL = os.environ.get('SUPABASE_URL')
 SUPABASE_KEY = os.environ.get('SUPABASE_KEY')
 
-if not SUPABASE_URL or not SUPABASE_KEY:
-    raise ValueError("SUPABASE_URL and SUPABASE_KEY environment variables are required")
+supabase: Client = None
 
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+def _get_client() -> Client:
+    """Get or create Supabase client."""
+    global supabase
+    if supabase is None:
+        if not SUPABASE_URL or not SUPABASE_KEY:
+            print(f"⚠️ SUPABASE_URL or SUPABASE_KEY not set!")
+            print(f"   SUPABASE_URL: {'set' if SUPABASE_URL else 'NOT SET'}")
+            print(f"   SUPABASE_KEY: {'set' if SUPABASE_KEY else 'NOT SET'}")
+            raise ValueError("SUPABASE_URL and SUPABASE_KEY environment variables are required")
+        supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    return supabase
 
 
 def init_database():
@@ -30,8 +39,9 @@ def init_database():
     This function just verifies the connection.
     """
     try:
+        client = _get_client()
         # Simple connection test
-        result = supabase.table('devices').select('device_id').limit(1).execute()
+        result = client.table('devices').select('device_id').limit(1).execute()
         print("✅ Supabase database connected successfully")
     except Exception as e:
         print(f"⚠️ Supabase connection warning: {e}")
@@ -43,7 +53,7 @@ def init_database():
 def upsert_device(device_id: str) -> None:
     """Insert or update device record."""
     try:
-        supabase.table('devices').upsert({
+        _get_client().table('devices').upsert({
             'device_id': device_id,
             'last_seen': datetime.now().isoformat(),
             'status': 'online'
@@ -55,7 +65,7 @@ def upsert_device(device_id: str) -> None:
 def get_all_devices() -> List[Dict[str, Any]]:
     """Get all devices with their status."""
     try:
-        result = supabase.table('devices').select('*').order('last_seen', desc=True).execute()
+        result = _get_client().table('devices').select('*').order('last_seen', desc=True).execute()
         return result.data
     except Exception as e:
         print(f"Error getting devices: {e}")
@@ -68,7 +78,7 @@ def save_detection(device_id: str, animal: str, confidence: float,
                    image_path: str, timestamp: datetime) -> int:
     """Save detection result to database."""
     try:
-        result = supabase.table('detections').insert({
+        result = _get_client().table('detections').insert({
             'device_id': device_id,
             'animal': animal,
             'confidence': confidence,
@@ -84,7 +94,7 @@ def save_detection(device_id: str, animal: str, confidence: float,
 def get_all_detections(limit: int = 100) -> List[Dict[str, Any]]:
     """Get all detections, most recent first."""
     try:
-        result = supabase.table('detections').select('*').order('timestamp', desc=True).limit(limit).execute()
+        result = _get_client().table('detections').select('*').order('timestamp', desc=True).limit(limit).execute()
         return result.data
     except Exception as e:
         print(f"Error getting detections: {e}")
@@ -99,7 +109,7 @@ def get_recent_detections(limit: int = 5) -> List[Dict[str, Any]]:
 def get_detection_count() -> int:
     """Get total detection count."""
     try:
-        result = supabase.table('detections').select('id', count='exact').execute()
+        result = _get_client().table('detections').select('id', count='exact').execute()
         return result.count or 0
     except Exception as e:
         print(f"Error getting detection count: {e}")
@@ -111,7 +121,7 @@ def get_detection_count() -> int:
 def save_alert(device_id: str, message: str) -> int:
     """Save alert to database."""
     try:
-        result = supabase.table('alerts').insert({
+        result = _get_client().table('alerts').insert({
             'device_id': device_id,
             'message': message,
             'timestamp': datetime.now().isoformat()
@@ -125,7 +135,7 @@ def save_alert(device_id: str, message: str) -> int:
 def get_all_alerts(limit: int = 100) -> List[Dict[str, Any]]:
     """Get all alerts, most recent first."""
     try:
-        result = supabase.table('alerts').select('*').order('timestamp', desc=True).limit(limit).execute()
+        result = _get_client().table('alerts').select('*').order('timestamp', desc=True).limit(limit).execute()
         return result.data
     except Exception as e:
         print(f"Error getting alerts: {e}")
@@ -135,7 +145,7 @@ def get_all_alerts(limit: int = 100) -> List[Dict[str, Any]]:
 def get_alert_count() -> int:
     """Get total alert count."""
     try:
-        result = supabase.table('alerts').select('id', count='exact').execute()
+        result = _get_client().table('alerts').select('id', count='exact').execute()
         return result.count or 0
     except Exception as e:
         print(f"Error getting alert count: {e}")
@@ -145,7 +155,7 @@ def get_alert_count() -> int:
 def delete_alert(alert_id: int) -> bool:
     """Delete an alert by ID."""
     try:
-        result = supabase.table('alerts').delete().eq('id', alert_id).execute()
+        result = _get_client().table('alerts').delete().eq('id', alert_id).execute()
         return len(result.data) > 0
     except Exception as e:
         print(f"Error deleting alert: {e}")
@@ -157,7 +167,7 @@ def delete_alert(alert_id: int) -> bool:
 def get_active_device_count() -> int:
     """Get count of devices that are online."""
     try:
-        result = supabase.table('devices').select('device_id', count='exact').eq('status', 'online').execute()
+        result = _get_client().table('devices').select('device_id', count='exact').eq('status', 'online').execute()
         return result.count or 0
     except Exception as e:
         print(f"Error getting active device count: {e}")
@@ -187,7 +197,7 @@ DEFAULT_CONFIG = {
 def get_device_config(device_id: str) -> Optional[Dict[str, Any]]:
     """Get configuration for a specific device."""
     try:
-        result = supabase.table('device_config').select('*').eq('device_id', device_id).execute()
+        result = _get_client().table('device_config').select('*').eq('device_id', device_id).execute()
         if result.data:
             return result.data[0]
         return None
@@ -204,7 +214,7 @@ def create_default_config(device_id: str) -> Dict[str, Any]:
             **DEFAULT_CONFIG,
             'updated_at': datetime.now().isoformat()
         }
-        result = supabase.table('device_config').insert(config_data).execute()
+        result = _get_client().table('device_config').insert(config_data).execute()
         if result.data:
             return result.data[0]
         return config_data
@@ -233,7 +243,7 @@ def update_device_config(device_id: str, config_data: Dict[str, Any]) -> Optiona
         update_data = {k: v for k, v in config_data.items() if k in valid_fields}
         update_data['updated_at'] = datetime.now().isoformat()
         
-        result = supabase.table('device_config').update(update_data).eq('device_id', device_id).execute()
+        result = _get_client().table('device_config').update(update_data).eq('device_id', device_id).execute()
         
         if result.data:
             return result.data[0]
